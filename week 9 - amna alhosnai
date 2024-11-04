@@ -1,1 +1,61 @@
+// Pin Definitions
+const int trigPin = 3;         // Trig pin for ultrasonic sensor
+const int echoPin = 4;         // Echo pin for ultrasonic sensor
+const int switchPin = 2;       // Switch pin
+const int distanceLedPin = 9;  // LED that varies with distance
+const int switchLedPin = 10;   // LED controlled by switch
 
+void setup() {
+  // Initialize pin modes
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(switchPin, INPUT_PULLUP);  // Internal pull-up resistor for the switch
+  pinMode(distanceLedPin, OUTPUT);
+  pinMode(switchLedPin, OUTPUT);
+
+  // Start the Serial Monitor for debugging
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Switch LED Control 
+  int switchState = digitalRead(switchPin);
+
+  // Control the switch LED
+  if (switchState == LOW) {   // Switch is pressed
+    digitalWrite(switchLedPin, HIGH);  // Turn on the LED
+  } else {
+    digitalWrite(switchLedPin, LOW);   // Turn off the LED
+  }
+
+  // Ultrasonic Sensor Distance Measurement
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Measure the time it takes for the echo to return
+  long duration = pulseIn(echoPin, HIGH);
+
+  // Calculate the distance in centimeters
+  int distance = duration * 0.034 / 2; // Speed of sound is ~0.034 cm/us
+
+  // Map the distance to LED brightness
+  int brightness = map(distance, 0, 100, 255, 0); // Closer = brighter, max distance = dim
+  brightness = constrain(brightness, 0, 255);     // Keep brightness within 0-255
+
+  // Set the brightness of the distance LED
+  analogWrite(distanceLedPin, brightness);
+
+  // Print switch state, distance, and brightness to the Serial Monitor becuase i wanted to check the numbers properlly and debug if theres issues
+  Serial.print("Switch State: ");
+  Serial.print(switchState == LOW ? "Pressed" : "Not Pressed");
+  Serial.print(", Distance: ");
+  Serial.print(distance);
+  Serial.print(" cm, LED Brightness: ");
+  Serial.println(brightness);
+
+  // Short delay to avoid overwhelming the Serial Monitor
+  delay(500);
+}
