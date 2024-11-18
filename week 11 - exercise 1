@@ -1,0 +1,11 @@
+int sensorPin = A0; // Sensor connected to A0
+
+void setup() {
+  Serial.begin(9600); // Start serial communication
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin); // Read sensor value
+  Serial.println(sensorValue); // Send the value to p5.js
+  delay(10); // Small delay to avoid overwhelming the serial buffer
+}
